@@ -41,13 +41,12 @@ class LoadedAction{
 
 AppState reducer(AppState state, Object action) {
   if (action is IncrementCounterAction) {
-    print("Reduser increment");
+    print("Reducer increment");
     return state.copyWith(counter: state.counter + 1);
   } else if (action is LoadedAction) {
     print("Reducer loaded action");
     return state.copyWith(counter: action.counter);
   }
-
   return state;
 }
 
@@ -56,7 +55,6 @@ class MyApp extends StatelessWidget {
   Store<AppState> store;
 
   MyApp() {
-
     store = new Store<AppState>(
       reducer,
       initialState: new AppState(),

@@ -41,8 +41,10 @@ class LoadedAction{
 
 AppState reducer(AppState state, Object action) {
   if (action is IncrementCounterAction) {
+    print("Reduser increment");
     return state.copyWith(counter: state.counter + 1);
   } else if (action is LoadedAction) {
+    print("Reducer loaded action");
     return state.copyWith(counter: action.counter);
   }
 

@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
       initialState: new AppState(),
       middleware: [
         new EpicMiddleware(allEpics),
-        new LoggingMiddleware(formatter: LoggingMiddleware.multiLineFormatter)
+        new LoggingMiddleware.printer()
       ],
     );
 

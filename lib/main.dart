@@ -2,10 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux_demo/preferences.dart';
 import 'package:redux_epics/redux_epics.dart';
-import 'package:redux_persist/redux_persist.dart';
-import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux_demo/middleware.dart';
 
@@ -18,7 +15,6 @@ final allEpics = combineEpics<AppState>([
   loadFromPreferences
 ]);
 
-// Redux
 class AppState {
   final int counter;
 
@@ -39,7 +35,7 @@ class LoadedAction{
   LoadedAction(this.counter);
 }
 
-AppState reducer(AppState state, Object action) {
+AppState reducer(AppState state, dynamic action) {
   if (action is IncrementCounterAction) {
     print("Reducer increment");
     return state.copyWith(counter: state.counter + 1);
@@ -50,7 +46,12 @@ AppState reducer(AppState state, Object action) {
   return state;
 }
 
-// App
+loggingMiddleware(Store<int> store, action, NextDispatcher next) {
+  print('${new DateTime.now()}: $action');
+
+  next(action);
+}
+
 class MyApp extends StatelessWidget {
   Store<AppState> store;
 
@@ -69,7 +70,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // PersistorGate waits for state to be loaded before rendering
     return new StoreProvider(
         store: store,
         child: new MaterialApp(
@@ -79,7 +79,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Counter example
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -106,8 +105,6 @@ class MyHomePage extends StatelessWidget {
       ),
       floatingActionButton: new StoreConnector<AppState, VoidCallback>(
         converter: (store) {
-          // Return a `VoidCallback`, which is a fancy name for a function
-          // with no parameters. It only dispatches an Increment action.
           return () => store.dispatch(new IncrementCounterAction());
         },
         builder: (context, callback) => new FloatingActionButton(

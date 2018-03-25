@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux_demo/preferences.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux_demo/middleware.dart';
@@ -46,9 +49,23 @@ AppState reducer(AppState state, dynamic action) {
   return state;
 }
 
-loggingMiddleware(Store<int> store, action, NextDispatcher next) {
-  print('${new DateTime.now()}: $action');
+saveToPreference(Store<AppState> store, action, NextDispatcher next) {
+  if (action is IncrementCounterAction) {
+    print("saveToPreference");
+    var prefs = new Preferences();
+    prefs.save(store.state.counter +1);
+  }
+  next(action);
+}
 
+loadFromPreference(Store<AppState> store, action, NextDispatcher next) {
+  print(action);
+  if (action is LoadAction) {
+    print("loadFromPreference");
+    var prefs = new Preferences();
+    Future<int> counter = prefs.load();
+    counter.then((counter) => store.dispatch(new LoadedAction(counter)));
+  }
   next(action);
 }
 
@@ -60,8 +77,9 @@ class MyApp extends StatelessWidget {
       reducer,
       initialState: new AppState(),
       middleware: [
-        new EpicMiddleware(allEpics),
-        new LoggingMiddleware.printer()
+        new LoggingMiddleware.printer(),
+        saveToPreference,
+        loadFromPreference
       ],
     );
 
